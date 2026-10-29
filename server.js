@@ -307,6 +307,28 @@ async function handleRequest(request, response, dataFile, publicDirectory) {
   serveStatic(request, response, pathname, publicDirectory);
 }
 
+const requestHandler = (request, response) => {
+  response.on("error", (error) => {
+    console.error("Error al enviar la respuesta HTTP:", error);
+  });
+  void handleRequest(request, response, DEFAULT_DATA_FILE, DEFAULT_PUBLIC_DIRECTORY).catch((error) => {
+    if (response.headersSent) {
+      response.destroy(error);
+      return;
+    }
+    if (error instanceof HttpError) {
+      sendJson(response, error.status, {
+        error: { code: error.code, message: error.message },
+      });
+      return;
+    }
+    console.error("Error al procesar la solicitud HTTP:", error);
+    sendJson(response, 500, {
+      error: { code: "INTERNAL_SERVER_ERROR", message: "Ocurrió un error interno del servidor." },
+    });
+  });
+};
+
 export function createServer({
   dataFile = DEFAULT_DATA_FILE,
   publicDirectory = DEFAULT_PUBLIC_DIRECTORY,
@@ -318,31 +340,11 @@ export function createServer({
     }
   }
 
-  return createHttpServer((request, response) => {
-    response.on("error", (error) => {
-      console.error("Error al enviar la respuesta HTTP:", error);
-    });
-    void handleRequest(request, response, dataFile, publicDirectory).catch((error) => {
-      if (response.headersSent) {
-        response.destroy(error);
-        return;
-      }
-      if (error instanceof HttpError) {
-        sendJson(response, error.status, {
-          error: { code: error.code, message: error.message },
-        });
-        return;
-      }
-      console.error("Error al procesar la solicitud HTTP:", error);
-      sendJson(response, 500, {
-        error: { code: "INTERNAL_SERVER_ERROR", message: "Ocurrió un error interno del servidor." },
-      });
-    });
-  }).on("clientError", (error, socket) => {
-    console.error("Error en la conexión HTTP:", error);
-    socket.end("HTTP/1.1 400 Bad Request\r\n\r\n");
-  });
+  return createHttpServer(requestHandler);
 }
+
+// Exportación por defecto requerida por Vercel para Serverless Functions
+export default requestHandler;
 
 export function startServer() {
   const port = Number(process.env.PORT ?? 3000);
@@ -350,7 +352,7 @@ export function startServer() {
     throw new Error("PORT debe ser un número entero entre 0 y 65535.");
   }
 
-  const server = createServer();
+  const server = createHttpServer(requestHandler);
   server.listen(port, () => {
     const address = server.address();
     const actualPort = typeof address === "object" && address ? address.port : port;
