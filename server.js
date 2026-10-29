@@ -347,7 +347,7 @@ export function createServer({
   return createHttpServer(requestHandler);
 }
 
-// Exportación del servidor HTTP para Vercel (Serverless Functions)
+// Exportación del servidor HTTP para Vercel (Serverless Functions)[cite: 4]
 const server = createServer();
 export default server;
 
