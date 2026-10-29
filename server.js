@@ -344,7 +344,9 @@ export function createServer({
 }
 
 // Exportación por defecto requerida por Vercel para Serverless Functions
-export default requestHandler;
+// Instancia del servidor para Vercel (Serverless)
+const server = createServer();
+export default server;
 
 export function startServer() {
   const port = Number(process.env.PORT ?? 3000);
