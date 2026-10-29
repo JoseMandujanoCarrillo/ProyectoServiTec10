@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0d766e">
+    <meta name="description" content="Registra reportes de servicio técnico en campo, incluso sin conexión.">
+    <title>ServiTech | Reportes de campo</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div id="connectionStatus" class="connection-status" role="status" aria-live="polite">
+      <span class="status-indicator" aria-hidden="true"></span>
+      <span id="connectionText">Comprobando conexión…</span>
+    </div>
+
+    <header class="site-header">
+      <div class="header-content">
+        <a class="brand" href="/" aria-label="ServiTech, inicio">
+          <span class="brand-mark" aria-hidden="true">ST</span>
+          <span>
+            <strong>ServiTech Field</strong>
+            <small>Reportes de servicio técnico</small>
+          </span>
+        </a>
+        <button id="installButton" class="button button-light" type="button" hidden>Instalar aplicación</button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <section class="intro">
+        <p class="eyebrow">Trabajo de campo</p>
+        <h1>Registra un servicio</h1>
+        <p>Guarda el reporte en este dispositivo. Se enviará al servidor cuando vuelva la conexión.</p>
+      </section>
+
+      <div id="notice" class="notice" role="alert" aria-live="assertive" hidden></div>
+
+      <section class="panel" aria-labelledby="formTitle">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Nuevo registro</p>
+            <h2 id="formTitle">Datos del servicio</h2>
+          </div>
+          <span class="required-note">* Obligatorio</span>
+        </div>
+
+        <form id="reportForm">
+          <div class="form-grid">
+            <label class="field">
+              <span>Nombre del técnico <b>*</b></span>
+              <input id="technicianName" name="technicianName" type="text" maxlength="120" autocomplete="name" required>
+            </label>
+            <label class="field">
+              <span>Ubicación o comunidad <b>*</b></span>
+              <input id="location" name="location" type="text" maxlength="160" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Tipo de servicio <b>*</b></span>
+              <select id="serviceType" name="serviceType" required>
+                <option value="">Selecciona un servicio</option>
+                <option>Mantenimiento Preventivo</option>
+                <option>Reparación Correctiva</option>
+                <option>Instalación de Equipo</option>
+                <option>Inspección de Red</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Prioridad</span>
+              <select id="priority" name="priority">
+                <option>Baja</option>
+                <option selected>Media</option>
+                <option>Alta</option>
+                <option>Urgente</option>
+              </select>
+            </label>
+            <label class="field field-wide">
+              <span>Descripción y hallazgos <b>*</b></span>
+              <textarea id="description" name="description" rows="4" maxlength="2000" required></textarea>
+              <small>Máximo 2,000 caracteres.</small>
+            </label>
+          </div>
+          <button id="saveButton" class="button button-primary" type="submit">Guardar reporte</button>
+        </form>
+      </section>
+
+      <section class="panel reports-panel" aria-labelledby="reportsTitle">
+        <div class="panel-heading reports-heading">
+          <div>
+            <p class="eyebrow">En este dispositivo</p>
+            <h2 id="reportsTitle">Reportes registrados</h2>
+          </div>
+          <div class="reports-actions">
+            <span id="pendingBadge" class="pending-badge">0 pendientes</span>
+            <button id="syncButton" class="button button-secondary" type="button">Sincronizar</button>
+          </div>
+        </div>
+        <div id="reportsList" class="reports-list" aria-live="polite">
+          <p class="empty-state">Cargando reportes…</p>
+        </div>
+      </section>
+
+      <p class="ios-hint">En iPhone o iPad: usa Compartir y selecciona <strong>Añadir a pantalla de inicio</strong> para instalar la aplicación.</p>
+    </main>
+
+    <footer class="site-footer">ServiTech Field · Aplicación web progresiva para trabajo en campo</footer>
+  </body>
+</html>
