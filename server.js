@@ -334,17 +334,20 @@ export function createServer({
   publicDirectory = DEFAULT_PUBLIC_DIRECTORY,
 } = {}) {
   if (!sql) {
-    mkdirSync(dirname(dataFile), { recursive: true });
-    if (!existsSync(dataFile)) {
-      writeFileSync(dataFile, "[]\n", "utf8");
+    try {
+      mkdirSync(dirname(dataFile), { recursive: true });
+      if (!existsSync(dataFile)) {
+        writeFileSync(dataFile, "[]\n", "utf8");
+      }
+    } catch (e) {
+      // Ignorar errores de escritura en sistemas de archivos de solo lectura como Vercel
     }
   }
 
   return createHttpServer(requestHandler);
 }
 
-// Exportación por defecto requerida por Vercel para Serverless Functions
-// Instancia del servidor para Vercel (Serverless)
+// Exportación del servidor HTTP para Vercel (Serverless Functions)
 const server = createServer();
 export default server;
 
@@ -354,7 +357,6 @@ export function startServer() {
     throw new Error("PORT debe ser un número entero entre 0 y 65535.");
   }
 
-  const server = createHttpServer(requestHandler);
   server.listen(port, () => {
     const address = server.address();
     const actualPort = typeof address === "object" && address ? address.port : port;
